@@ -634,7 +634,7 @@ public interface TableRepository<T> {
     default void create() {
         // Получим класс дженерика класса
         Class cls = getTableModelClass();
-        String tableName = OrmUtils.getTableName(cls); // Ключем является имя класса
+        String tableName = OrmUtils.getTableName(cls); // Ключом является имя класса
         JdbcTemplate jdbcTemplate = OrmUtils.getJdbcTemplate();
         String sqlText = "CREATE TABLE " + tableName + "()";
         OrmUtils.logSQL(sqlText);
@@ -643,9 +643,19 @@ public interface TableRepository<T> {
     }
 
     /**
-     * Дефаустный метод первоначальной загрузки ВОзвращает количество добавленных записей
+     * Дефаулт метод создания представления для полнотекстового поиска
+     * Ничего не делает
      *
-     * @return
+     */
+    default void createFullTextView() {
+        // Если есть скрипт на создание представления типа ft_proguser
+        // то его надо переопределить
+    }
+
+    /**
+     * Дефаустный метод первоначальной загрузки
+     *
+     * @return - количество добавленных записей
      */
     default int load() {
         logger.info("0 record loaded");

@@ -147,6 +147,7 @@ public class ApplicationRepository implements TableRepository<Application> {
 
     @Override
     public void create() {
+        if (jdbcTemplate == null || jdbcTemplate.getJdbcTemplate().getDataSource() == null) return;
         Resource resource = new ClassPathResource("sql/400300-application.sql");
         ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
         databasePopulator.setSqlScriptEncoding("UTF-8");
@@ -176,6 +177,16 @@ public class ApplicationRepository implements TableRepository<Application> {
         logger.info(String.format("%d application loaded", data.length));
         DatabaseUtils.setSequence("application_id_gen", data.length + 1);
         return data.length;
+    }
+    @Override
+    public void createFullTextView() {
+        if (jdbcTemplate == null || jdbcTemplate.getJdbcTemplate().getDataSource() == null) return;
+        String fileName = "sql/400301-ft_application.sql";
+        Resource resource = new ClassPathResource(fileName);
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getJdbcTemplate().getDataSource());
+        logger.info(fileName + " was executed");
     }
 
 }

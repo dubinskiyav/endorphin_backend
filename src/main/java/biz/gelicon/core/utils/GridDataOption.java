@@ -287,7 +287,8 @@ public class GridDataOption {
     public String buildFullTextJoin(String tableName, String viewName, String aliasName) {
         if(isFullTextSearch()) {
             String idName = tableName+"_id";
-            return String.format("inner join %s %s on %2$s.%3$s=%4$s.%3$s",viewName, FULLTEXT_ALIAS,idName, aliasName);
+            String s = String.format("INNER JOIN %s %s ON %2$s.%3$s = %4$s.%3$s",viewName, FULLTEXT_ALIAS,idName, aliasName);
+            return s;
         }
         return null;
     }

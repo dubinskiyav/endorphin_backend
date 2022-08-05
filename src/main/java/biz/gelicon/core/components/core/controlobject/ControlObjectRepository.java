@@ -130,6 +130,15 @@ public class ControlObjectRepository implements TableRepository<ControlObject> {
         return data.length;
     }
 
+    @Override
+    public void createFullTextView() {
+        String fileName = "sql/400226-ft_controlobject.sql";
+        Resource resource = new ClassPathResource(fileName);
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getJdbcTemplate().getDataSource());
+        logger.info(fileName + " was executed");
+    }
 
 
 }

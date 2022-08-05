@@ -360,7 +360,8 @@ public class RecreateDatabase {
 
                    */
 
-                //TODO здесь регистриуются ркпозитиоии. Внимание! В правильном порядке СОЗДАНИЯ таблиц
+                //TODO здесь регистриуются репозитории.
+                // Внимание! В правильном порядке СОЗДАНИЯ таблиц
         };
     }
 
@@ -415,8 +416,18 @@ public class RecreateDatabase {
     @Transactional(propagation = Propagation.REQUIRED)
     public void create() {
         logger.info("Creating tables ...");
-        Arrays.asList(registerRepos).forEach(r -> r.create());
+        Arrays.asList(registerRepos).forEach(TableRepository::create);
         logger.info("Creating tables ... Ok");
+    }
+
+    /**
+     * Создание всех представлений для полнотекстового поиска
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void view() {
+        logger.info("Creating view ...");
+        Arrays.asList(registerRepos).forEach(TableRepository::createFullTextView);
+        logger.info("Creating view ... Ok");
     }
 
     /**
@@ -426,8 +437,8 @@ public class RecreateDatabase {
     public void drop() {
         logger.info("Dropping tables ...");
         // удаляем таблицы в обратном порядке
-        Arrays.asList(registerRepos).stream()
-                .collect(UsefulUtils.toListReversed()).forEach(r -> r.dropForTest());
+        Arrays.stream(registerRepos)
+                .collect(UsefulUtils.toListReversed()).forEach(TableRepository::dropForTest);
         // завершаем вызовом скрипта удаления общих данных
         dropCommon();
         // Удаляем UDF
@@ -441,7 +452,7 @@ public class RecreateDatabase {
     @Transactional(propagation = Propagation.REQUIRED)
     public void load() {
         logger.info("Loading tables ...");
-        Arrays.asList(registerRepos).forEach(r -> r.load());
+        Arrays.asList(registerRepos).forEach(TableRepository::load);
         logger.info("Loading tables ... Ok");
     }
 
@@ -451,7 +462,7 @@ public class RecreateDatabase {
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete() {
         logger.info("Deleting tables ...");
-        Arrays.asList(registerRepos).forEach(r -> r.deleteAll());
+        Arrays.asList(registerRepos).forEach(TableRepository::deleteAll);
         logger.info("Deleting tables ... Ok");
     }
 
@@ -468,10 +479,11 @@ public class RecreateDatabase {
             udf();
             common();
             create();
+            view();
             load();
             transactionManager.commit(transactionStatus);
         } catch (Exception e) {
-            String errText = String.format("Error. Transaction will be rolled back");
+            String errText = "Error. Transaction will be rolled back";
             logger.error(errText, e);
             transactionManager.rollback(transactionStatus);
             throw new RuntimeException(errText, e);

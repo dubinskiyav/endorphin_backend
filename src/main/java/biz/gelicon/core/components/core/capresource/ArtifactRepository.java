@@ -370,5 +370,22 @@ public class ArtifactRepository implements TableRepository<Artifact> {
         return data.length;
     }
 
+    @Override
+    public void createFullTextView() {
+        String fileName = "sql/400407-ft_capresource.sql";
+        Resource resource = new ClassPathResource(fileName);
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getJdbcTemplate().getDataSource());
+        logger.info(fileName + " was executed");
+
+        fileName = "sql/400407-ft_capresourceaccess.sql";
+        resource = new ClassPathResource(fileName);
+        databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getJdbcTemplate().getDataSource());
+        logger.info(fileName + " was executed");
+    }
+
 }
 

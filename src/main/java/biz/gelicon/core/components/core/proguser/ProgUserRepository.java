@@ -132,4 +132,14 @@ public class ProgUserRepository implements TableRepository<Proguser> {
         return data.length;
     }
 
+    @Override
+    public void createFullTextView() {
+        String fileName = "sql/400242-ft_proguser.sql";
+        Resource resource = new ClassPathResource(fileName);
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getDataSource());
+        logger.info(fileName + " was executed");
+    }
+
 }
