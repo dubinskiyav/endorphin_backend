@@ -1,0 +1,31 @@
+Для поиска предлагаю вместо представлений использовать поле
+В основную сущность добавлять поля поиска и с помощью триггеров поддерживать его актуальность
+
+Пример на большом количестве записей - таблица address и building
+
+ALTER TABLE address ADD COLUMN fulltext VARCHAR
+ALTER TABLE address ADD COLUMN fulltext_tsvector tsvector
+
+UPDATE address SET fulltext_tsvector =
+     to_tsvector(coalesce(addresss_building,'') || ' ' || coalesce(addresss_korpus,'') || ' ' ||
+     (SELECT building.building_remark FROM building WHERE building.building_id = address.building_id))
+
+CREATE INDEX address_idx10 ON address USING GIN (fulltext_tsvector)
+
+
+SELECT *
+FROM   address A,
+       building B
+WHERE  B.building_id = A.building_id
+  AND  A.fulltext_tsvector @@ plainto_tsquery('ялта')
+
+
+UPDATE address SET fulltext =
+     UPPER(coalesce(addresss_building,'') || ' ' || coalesce(addresss_korpus,'') || ' ' ||
+     (SELECT building.building_remark FROM building WHERE building.building_id = address.building_id))
+
+SELECT *
+FROM   address A,
+       building B
+WHERE  B.building_id = A.building_id
+  AND  A.fulltext  LIKE UPPER('%ялта%')

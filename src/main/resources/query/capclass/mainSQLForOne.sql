@@ -1,0 +1,3 @@
+SELECT *
+FROM capclass m0
+WHERE 1=1 /*WHERE_PLACEHOLDER*/
