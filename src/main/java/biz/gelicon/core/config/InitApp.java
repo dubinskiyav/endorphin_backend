@@ -101,6 +101,10 @@ public class InitApp implements ApplicationRunner {
             maintenanceSystemService.fillControlObject(geliconCorePrefix);
             // Зарегистрируем отчеты, нумераторы и другие ресурсы
             maintenanceSystemService.fillCapresource();
+            // Добавление ролей
+            maintenanceSystemService.fillAccessRoleCore();
+            // вторая сборка таблицы доступа
+            acl.buildAccessTable();
         }
 
         logger.info("InitApp running...Ok");

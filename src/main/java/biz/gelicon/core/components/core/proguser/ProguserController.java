@@ -2,6 +2,7 @@ package biz.gelicon.core.components.core.proguser;
 
 import biz.gelicon.core.annotations.Audit;
 import biz.gelicon.core.annotations.CheckAdminPermission;
+import biz.gelicon.core.annotations.CheckPermission;
 import biz.gelicon.core.audit.AuditKind;
 import biz.gelicon.core.components.core.accessrole.AccessRole;
 import biz.gelicon.core.components.core.capcode.CapCode;
@@ -101,7 +102,8 @@ public class ProguserController {
 
     @Operation(summary = ConstantForControllers.GETLIST_OPERATION_SUMMARY,
             description = ConstantForControllers.GETLIST_OPERATION_DESCRIPTION)
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/getlist", method = RequestMethod.POST)
     public DataResponse<ProguserView> getlist(@RequestBody GridDataOptionProguser gridDataOption) {
 
@@ -152,7 +154,8 @@ public class ProguserController {
 
     @Operation(summary = ConstantForControllers.GET_OPERATION_SUMMARY,
             description = ConstantForControllers.GET_OPERATION_DESCRIPTION)
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/get", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.CALL_FOR_EDIT,AuditKind.CALL_FOR_ADD})
     public ProguserDTO get(@RequestBody(required = false) Integer id) {
@@ -196,7 +199,8 @@ public class ProguserController {
 
     @Operation(summary = ConstantForControllers.SAVE_OPERATION_SUMMARY,
             description = ConstantForControllers.SAVE_OPERATION_DESCRIPTION)
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/save", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.CALL_FOR_SAVE_UPDATE,AuditKind.CALL_FOR_SAVE_INSERT})
     public ProguserView save(@RequestBody ProguserDTO proguserDTO) {
@@ -240,7 +244,8 @@ public class ProguserController {
 
     @Operation(summary = ConstantForControllers.DELETE_OPERATION_SUMMARY,
             description = ConstantForControllers.DELETE_OPERATION_DESCRIPTION)
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/delete", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.CALL_FOR_DELETE})
     public String delete(@RequestBody int[] ids) {
@@ -275,7 +280,8 @@ public class ProguserController {
 
     @Operation(summary = "Установка пароля у пользователя",
             description = "Позволяет установить новый пароль у пользователя, включая временный")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/setpswd", method = RequestMethod.POST)
     @ResponseBody
     public String setPassword(@RequestBody
@@ -294,7 +300,8 @@ public class ProguserController {
 
     @Operation(summary = "Список ролей пользователя",
             description = "Возвращает список ролей указанного пользователя")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/roles/getlist", method = RequestMethod.POST)
     public List<AccessRoleView> accessroles(@RequestBody ProguserRequest request) {
         List<AccessRole> roles  = proguserService.getRoleList(request.getProguserId());
@@ -303,7 +310,8 @@ public class ProguserController {
 
     @Operation(summary = "Список ролей пользователя для редактора ролей",
             description = "Возвращает список ролей указанного пользователя")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/roles/get", method = RequestMethod.POST)
     public ProguserAccessRoleView getProguserAccessRoles(@RequestBody Integer id) {
         Proguser entity = proguserService.findById(id);
@@ -320,7 +328,8 @@ public class ProguserController {
 
     @Operation(summary = "Сохранить список ролей пользователя",
             description = "Сохраняет список ролей указанного пользователя")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/roles/save", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.SECURITY_SYSTEM})
     public String accessrolesSave(@RequestBody ProguserRoleDTO proguserRoleDTO) {
@@ -353,7 +362,8 @@ public class ProguserController {
 
     @Operation(summary = "Список пользователей по поисковой сроке",
             description = "Возвращает список пользователей в наименовании, или логине которых встречается поисковая строка")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "proguser/find", method = RequestMethod.POST)
     public List<ProguserView> find(@RequestBody SimpleSearchOption options) {
         //Защита от коротких поисковых строк

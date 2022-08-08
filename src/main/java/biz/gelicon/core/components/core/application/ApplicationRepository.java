@@ -119,6 +119,12 @@ public class ApplicationRepository implements TableRepository<Application> {
         return count.intValue() > 0;
     }
 
+    /**
+     * Дает доступ роли на аппликацию
+     * @param accessRoleId
+     * @param appId
+     * @return
+     */
     public int allow(Integer accessRoleId, Integer appId) {
         if (isLinkedWithRole(accessRoleId, appId)) {
             return 0;
@@ -158,10 +164,10 @@ public class ApplicationRepository implements TableRepository<Application> {
     @Override
     public int load() {
         Application[] data = new Application[]{
+                new Application(1000, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm1", "Пользователи",
+                        "credential", null),
                 new Application(1, Application.TYPE_GELICON_CORE_APP, "s1.m0.sm1",
                         "Справочник единиц измерения", "edizm", "edizm"),
-                new Application(2, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm1", "Пользователи",
-                        "credential", null),
                 new Application(3, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm2", "Роли", "credential",
                         null),
                 new Application(4, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm3", "Права", "credential",

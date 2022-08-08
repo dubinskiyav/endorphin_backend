@@ -33,6 +33,8 @@ public class ControlObjectRoleRepository implements TableRepository<ControlObjec
 
     @Override
     public int load() {
+        return 0;
+        /*
         //Роль TEST1 связана с всеми функциями edizm, кроме удаления
         accessRoleRepository.bindWithControlObject(1, 1, Permission.EXECUTE);
         accessRoleRepository.bindWithControlObject(1, 2, Permission.EXECUTE);
@@ -45,6 +47,8 @@ public class ControlObjectRoleRepository implements TableRepository<ControlObjec
         accessRoleRepository.bindWithControlObject(4, 4, Permission.EXECUTE);
 
         return 7;
+
+         */
     }
     
 

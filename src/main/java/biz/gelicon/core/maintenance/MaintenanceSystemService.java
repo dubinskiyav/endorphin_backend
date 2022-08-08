@@ -7,16 +7,23 @@ import biz.gelicon.core.artifacts.ArtifactDescriptionImpl;
 import biz.gelicon.core.artifacts.ArtifactKinds;
 import biz.gelicon.core.artifacts.ArtifactManagerImpl;
 import biz.gelicon.core.artifacts.ArtifactTranKinds;
+import biz.gelicon.core.components.core.accessrole.AccessRole;
+import biz.gelicon.core.components.core.accessrole.AccessRoleRepository;
+import biz.gelicon.core.components.core.accessrole.AccessRoleService;
+import biz.gelicon.core.components.core.application.Application;
+import biz.gelicon.core.components.core.application.ApplicationRepository;
 import biz.gelicon.core.components.core.capresource.Artifact;
+import biz.gelicon.core.components.core.capresource.ArtifactRepository;
 import biz.gelicon.core.components.core.controlobject.ControlObject;
+import biz.gelicon.core.components.core.controlobject.ControlObjectRepository;
 import biz.gelicon.core.components.core.document.Document;
+import biz.gelicon.core.components.core.document.DocumentRepository;
+import biz.gelicon.core.components.core.proguser.ProgUserRepository;
 import biz.gelicon.core.components.core.proguser.Proguser;
+import biz.gelicon.core.components.core.proguser.ProguserService;
 import biz.gelicon.core.reports.ReportDescriptionImpl;
 import biz.gelicon.core.reports.ReportManagerImpl;
-import biz.gelicon.core.components.core.application.ApplicationRepository;
-import biz.gelicon.core.components.core.capresource.ArtifactRepository;
-import biz.gelicon.core.components.core.controlobject.ControlObjectRepository;
-import biz.gelicon.core.components.core.document.DocumentRepository;
+import biz.gelicon.core.security.Permission;
 import biz.gelicon.core.utils.ReflectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,8 +41,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,11 +78,128 @@ public class MaintenanceSystemService {
     DocumentRepository documentRepository;
 
     @Autowired
+    AccessRoleRepository accessRoleRepository;
+    @Autowired
+    AccessRoleService accessRoleService;
+    @Autowired
     ApplicationRepository applicationRepository;
+    @Autowired
+    ProgUserRepository progUserRepository;
+    @Autowired
+    ProguserService proguserService;
+
 
     /** префикс пакетов системы */
     @Value("${gelicon.core.prefix:biz.gelicon.core}")
     private String geliconCorePrefix;
+
+    /**
+     * Вспомогательный класс
+     */
+    private class AccessRoleDop {
+        AccessRole accessRole; // Роль доступа
+        String applicationName; // Имя прилолжения с которым связывать
+        List<String> urlList; // Маска урл которые добавлять
+
+        public AccessRoleDop(AccessRole accessRole, String applicationName, String url) {
+            this.accessRole = accessRole;
+            this.applicationName = applicationName;
+            urlList = new ArrayList<>();
+            urlList.add(url);
+        }
+    }
+
+    /**
+     * Добавление ролей для ядра для пользователя proguserName = "FULL_ACCESS"
+     */
+    public void fillAccessRoleCore() {
+        logger.info("Filling Access Role...");
+        // Проверим количество. Если больше 6 - значит уже добавлялись и добавлять не надо
+        List<AccessRole> accessRoleList = accessRoleRepository.findAll();
+        if (accessRoleList.size() > 6) {
+            logger.info("Do nothing");
+            return;
+        }
+        // Все пользователи
+        List<Proguser> proguserList = progUserRepository.findAll();
+        // Найдем пользователя Полный доступ - этому пользователю будут даваться все роли
+        String proguserName = "FULL_ACCESS";
+        Integer proguserId = proguserList.stream()
+                .filter(proguser -> proguser.getProguserName().contains(proguserName))
+                .findAny()
+                .map(Proguser::getProguserId)
+                .orElse(null);
+        if (proguserId == null) {
+            throw new RuntimeException("Не найден пользователь '" + proguserName + "'");
+        }
+        // Все контролируемые объекты
+        List<ControlObject> controlObjectList = controlObjectRepository.findAll();
+        //controlObjectList.forEach(c -> System.out.println(c.getControlObjectUrl()));
+        // Все аппликации
+        List<Application> applicationList = applicationRepository.findAll();
+
+        // Список ролей, которые надо создать
+        List<AccessRoleDop> accessRoleDopList = new ArrayList<>();
+        // Модуль Пользователи
+        AccessRoleDop ard = new AccessRoleDop(
+                new AccessRole(
+                        1000,
+                        "_PROGUSER", //
+                        "Пользователи - ведение справочника (просмотр, модификация)",
+                        1),  // Эта роль будет создана
+                "Пользователи", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/proguser"  // Это маска методов контроллеров, которые будут добавляться к этой роли
+        );
+        // Дополнительные урлы не попадающие под общую маску
+        ard.urlList.add("admin/credential/accessrole/getlist");
+        accessRoleDopList.add(ard);
+        // Здесь добавляем еще
+        // Цикл по ним
+        for (AccessRoleDop accessRoleDop: accessRoleDopList) {
+            Integer applicationId = applicationList.stream()
+                    .filter(application -> application.getApplicationName().contains(accessRoleDop.applicationName))
+                    .findAny()
+                    .map(Application::getApplicationId)
+                    .orElse(null);
+            if (applicationId == null) {
+                throw new RuntimeException("Не найден модуль '" + accessRoleDop.applicationName + "'");
+            }
+            // Добавим роль для модуля Пользователи
+            AccessRole accessRole = accessRoleService.add(accessRoleDop.accessRole);
+            // Найдем все контролируемые объекты, которые надо связать с этой ролью
+            List <ControlObject> lp = controlObjectList.stream()
+                    .filter(c -> {
+                        // По всем
+                        for (String url: accessRoleDop.urlList) {
+                            if (c.getControlObjectUrl().contains(url)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    })
+                    //.filter(c -> c.getControlObjectUrl().contains(accessRoleDop.urlList.get(0)))
+                    .collect(Collectors.toList());
+            // Добавим их все в controlobjectrole
+            for (ControlObject controlObject: lp) {
+                accessRoleRepository.bindWithControlObject(
+                        accessRole.getAccessRoleId(),
+                        controlObject.getControlObjectId(),
+                        Permission.EXECUTE);
+            }
+            // Добавим доступ на аппликацию
+            applicationRepository.allow(
+                    accessRole.getAccessRoleId(),
+                    applicationId
+            );
+            // todo доступ к печатным формам
+            // Дадим пользователю FULL_ACCESS
+            proguserService.saveRoles(
+                    proguserId,
+                    Collections.singletonList(accessRole.getAccessRoleId())
+            );
+        }
+        logger.info("Filling Access Role...Ok");
+    }
 
     public void fillCapresource() {
         // Отчеты

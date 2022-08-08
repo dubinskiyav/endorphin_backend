@@ -36,12 +36,7 @@ public class ProgUserRoleRepository implements TableRepository<ProguserRole> {
         // Пользователь root всегда связан с ролью SYSDBA
         accessRoleRepository.bindWithProgUser(0, 1);
 
-        // Пользователь test1 связан с ролью TEST1
-        accessRoleRepository.bindWithProgUser(1, 2);
-        // Пользователь test3 связан с ролью TEST2
-        accessRoleRepository.bindWithProgUser(2, 4);
-
-        return 3;
+        return 1;
     }
 
 }

@@ -1,6 +1,7 @@
 package biz.gelicon.core.audit;
 
 import biz.gelicon.core.annotations.CheckAdminPermission;
+import biz.gelicon.core.annotations.CheckPermission;
 import biz.gelicon.core.audit.AuditRecord;
 import biz.gelicon.core.audit.AuditService;
 import biz.gelicon.core.config.Config;
@@ -80,7 +81,8 @@ public class AuditController {
 
     @Operation(summary = "Список объектов \"Аудит\"",
             description = "Возвращает постраничный список объектов \"Аудит\"")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "log/getlist", method = RequestMethod.POST)
     public DataResponse<AuditRecord> getlist(@RequestBody GridDataOptionAudit gridDataOption) {
         Map<String, Object> filters = gridDataOption.getFilters();
@@ -133,7 +135,8 @@ public class AuditController {
 
     @Operation(summary = "Получение одной записи таблицы \"Аудит\" по ee идентификатору",
             description = "Возвращает одну запись таблицы \"Аудит\" по ee идентификатору ")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "log/get", method = RequestMethod.POST)
     public AuditRecord get(@RequestBody AuditRequest rec) {
         AuditRecord record = auditService.get(rec.getLogId(),new Date(rec.getDatetime()));

@@ -121,14 +121,15 @@ public class ProgUserRepository implements TableRepository<Proguser> {
         Proguser[] data =  new Proguser[] {
                // добавлен при создании
                 // new Proguser(1, CapCode.USER_IS_ACTIVE,  "SYSDBA","Системный администратор"),
-                new Proguser(2, CapCode.USER_IS_ACTIVE,   "fsa","Федосеев С.А."),
-                new Proguser(3, CapCode.USER_IS_BLOCKED,  "mav","Могильный А.В."),
-                new Proguser(4, CapCode.USER_IS_ACTIVE,   "dav","Дубинский А.В."),
-                new Proguser(5, CapCode.USER_IS_ACTIVE,   "kav","Клюев А.В."),
+                new Proguser(2, CapCode.USER_IS_ACTIVE,   "FULL_ACCESS","Пользователь с полным доступом"),
+                new Proguser(1000, CapCode.USER_IS_ACTIVE,   "fsa","Федосеев С.А."),
+                new Proguser(2000, CapCode.USER_IS_BLOCKED,  "mav","Могильный А.В."),
+                new Proguser(3000, CapCode.USER_IS_ACTIVE,   "dav","Дубинский А.В."),
+                new Proguser(4000, CapCode.USER_IS_ACTIVE,   "kav","Клюев А.В."),
         };
         insert(Arrays.asList(data));
         logger.info(String.format("%d proguser loaded", data.length));
-        DatabaseUtils.setSequence("proguser_id_gen", 5);
+        DatabaseUtils.setSequence("proguser_id_gen", 10000);
         return data.length;
     }
 

@@ -23,7 +23,6 @@ public class AccessRoleRepository implements TableRepository<AccessRole> {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-
     public List<AccessRole> findByUser(Integer progUserId) {
         List<AccessRole> accessRoleList;
         if (progUserId == Proguser.SYSDBA_PROGUSER_ID) {

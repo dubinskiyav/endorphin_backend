@@ -74,7 +74,8 @@ public class ArtifactRoleController {
 
     @Operation(summary = "Установить запрет на \"Артефакт\"",
             description = "Установить запрет на объекты \"Артефакт\", чьи идентификаторы переданы, для роли, чей идентификатор также передан.")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "artifactrole/restrict", method = RequestMethod.POST)
     @ResponseBody
     @Audit(kinds={AuditKind.SECURITY_SYSTEM})
@@ -85,7 +86,8 @@ public class ArtifactRoleController {
 
     @Operation(summary = "Установить разрешение на \"Артефакт\"",
             description = "Установить разрешение на объекты \"Артефакт\", чьи идентификаторы переданы, для роли, чей идентификатор также передан.")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "artifactrole/allow", method = RequestMethod.POST)
     @ResponseBody
     @Audit(kinds={AuditKind.SECURITY_SYSTEM})
@@ -96,7 +98,8 @@ public class ArtifactRoleController {
 
     @Operation(summary = "Сбросить ограничение/разрешения на объект \"Артефакт\" у роли",
             description = "Сбросить ограничение/разрешения на объекты \"Артефакт\", чьи идентификаторы переданы, у роли, чей идентификатор также передан.")
-    @CheckAdminPermission
+    // dav убираем за ненадобностью @CheckAdminPermission
+    @CheckPermission
     @RequestMapping(value = "artifactrole/drop", method = RequestMethod.POST)
     @ResponseBody
     @Audit(kinds={AuditKind.SECURITY_SYSTEM})

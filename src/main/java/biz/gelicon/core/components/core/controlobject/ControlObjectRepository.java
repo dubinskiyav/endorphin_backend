@@ -1,5 +1,6 @@
 package biz.gelicon.core.components.core.controlobject;
 
+import biz.gelicon.core.components.core.accessrole.AccessRole;
 import biz.gelicon.core.repository.TableRepository;
 import biz.gelicon.core.security.Permission;
 import biz.gelicon.core.utils.DatabaseUtils;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -105,6 +107,8 @@ public class ControlObjectRepository implements TableRepository<ControlObject> {
 
     @Override
     public int load() {
+        return 0;
+        /*
         ControlObject[] data = new ControlObject[]{
                 new ControlObject(1, "Просмотр списка единиц измерения",
                         "/v1/apps/refbooks/edizm/edizm/getlist"),
@@ -128,6 +132,8 @@ public class ControlObjectRepository implements TableRepository<ControlObject> {
         logger.info(String.format("%d controlobject loaded", data.length));
         DatabaseUtils.setSequence("controlobject_id_gen", data.length + 1);
         return data.length;
+
+         */
     }
 
     @Override

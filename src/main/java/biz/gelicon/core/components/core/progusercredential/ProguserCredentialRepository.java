@@ -59,10 +59,13 @@ public class ProguserCredentialRepository implements TableRepository<ProguserCre
         final String user1 = "e572cec4ee0d79651b3f8b15339047e114e4bab5365591748fc39e3ffc353220cc029b920795cd88f9d3c4877de8c1a7";
         ProguserCredential[] data =  new ProguserCredential[] {
                 new ProguserCredential(1,masterkey,1, CapCode.AUTH_BYPASSWORD,0,0),
+                /*
                 new ProguserCredential(2,admin,2, CapCode.AUTH_BYPASSWORD,0,0),
                 new ProguserCredential(3,user,3, CapCode.AUTH_BYPASSWORD,0,0),
                 new ProguserCredential(4,worker,4, CapCode.AUTH_BYPASSWORD,0,0),
                 new ProguserCredential(5,user1,5, CapCode.AUTH_BYPASSWORD,0,0),
+
+                 */
         };
         insert(Arrays.asList(data));
         logger.info(String.format("%d progusercredential loaded", data.length));

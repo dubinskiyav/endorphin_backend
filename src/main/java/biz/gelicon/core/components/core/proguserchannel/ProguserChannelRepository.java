@@ -68,10 +68,10 @@ public class ProguserChannelRepository implements TableRepository<ProguserChanne
     public int load() {
         ProguserChannel[] data =  new ProguserChannel[] {
                 new ProguserChannel(1,1,CapCode.CHANNEL_EMAIL,"test@test.com"),
-                new ProguserChannel(2,2,CapCode.CHANNEL_EMAIL,"fsa@gelicon.biz"),
-                new ProguserChannel(3,3,CapCode.CHANNEL_EMAIL,"mav@gelicon.biz"),
-                new ProguserChannel(4,4,CapCode.CHANNEL_EMAIL,"dav@gelicon.biz"),
-                new ProguserChannel(5,5,CapCode.CHANNEL_EMAIL,"kav@gelicon.biz")
+                new ProguserChannel(2,1000,CapCode.CHANNEL_EMAIL,"fsa@gelicon.biz"),
+                new ProguserChannel(3,2000,CapCode.CHANNEL_EMAIL,"mav@gelicon.biz"),
+                new ProguserChannel(4,3000,CapCode.CHANNEL_EMAIL,"dav@gelicon.biz"),
+                new ProguserChannel(5,4000,CapCode.CHANNEL_EMAIL,"kav@gelicon.biz")
         };
         insert(Arrays.asList(data));
         logger.info(String.format("%d proguserchannel loaded", data.length));
