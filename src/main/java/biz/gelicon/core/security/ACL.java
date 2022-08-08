@@ -28,6 +28,13 @@ public class ACL {
 
     private Map<String, List<String>> accessTable = new HashMap<>();
 
+    /**
+     * Проверяет доступ пользователю на объект доступа
+     * @param accobject - объект
+     * @param user - пользователь
+     * @param permission - тип доступа
+     * @return - да нет
+     */
     public boolean checkPermission(String accobject, UserDetails user, Permission permission) {
         // системному пользователю можно все
         if(((UserDetailsImpl)user).containsSystemRole()) return true;
@@ -38,7 +45,7 @@ public class ACL {
         // получаем список ролей для объекта и операции
         List<String> objectRoles = accessTable.get(genKey(accobject, permission.ordinal()));
         // вообще нет ролей
-        if(objectRoles==null) {
+        if(objectRoles == null) {
             return false;
         }
         // ищем пересечение
@@ -46,7 +53,7 @@ public class ACL {
                 .filter(gauth -> objectRoles.contains(gauth.getAuthority()))
                 .findFirst() // хотя бы одна роль найдена
                 .orElse(null);
-        return intersect!=null;
+        return intersect != null;
     }
 
     public void buildAccessTable() {

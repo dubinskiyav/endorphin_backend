@@ -19,51 +19,68 @@ import java.lang.reflect.Parameter;
 
 @Component
 public class RolePermissionEvaluator implements PermissionEvaluator {
+
     private static final Logger logger = LoggerFactory.getLogger(RolePermissionEvaluator.class);
 
     @Autowired
     ACL acl;
 
     @Override
-    public boolean hasPermission(Authentication auth, Object targetDomainObject, Object permission) {
+    public boolean hasPermission(Authentication auth, Object targetDomainObject,
+            Object permission) {
         MethodInvocation mi = ((UserDetailsImpl) auth.getPrincipal()).getMethodInvocation();
         RequestMapping methodRequestMapping = mi.getMethod().getAnnotation(RequestMapping.class);
-        if(methodRequestMapping==null) {
-            logger.warn("RequestMapping annotation not found: {}",mi.getMethod().toString());
+        if (methodRequestMapping == null) {
+            logger.warn("RequestMapping annotation not found: {}", mi.getMethod().toString());
             return false;
         }
         boolean methodIsGet = ReflectUtils.isGetMethod(mi.getMethod());
         boolean methodIsSave = ReflectUtils.isSaveMethod(mi.getMethod());
         // ищем RequestMapping у класса
-        RequestMapping rootRequestMapping = mi.getMethod().getDeclaringClass().getAnnotation(RequestMapping.class);
-        String[] prefixes = rootRequestMapping!=null?rootRequestMapping.value():new String[]{""};
+        RequestMapping rootRequestMapping = mi.getMethod().getDeclaringClass()
+                .getAnnotation(RequestMapping.class);
+        String[] prefixes =
+                rootRequestMapping != null ? rootRequestMapping.value() : new String[]{""};
 
         // по всем url в RequestMapping должен быть доступ
-        for (String pref:prefixes) {
-            for (String url:methodRequestMapping.value()) {
+        for (String pref : prefixes) {
+            for (String url : methodRequestMapping.value()) {
                 String fullUrl = normalizeObjectName(pref, url);
 
-                if(!acl.checkPermission(fullUrl,(UserDetails)auth.getPrincipal(),Permission.EXECUTE)) {
+                if (!acl.checkPermission(fullUrl, (UserDetails) auth.getPrincipal(),
+                        Permission.EXECUTE)) {
                     // если метод get надо еще проверить расширенные права
-                    if(methodIsGet) {
+                    if (methodIsGet) {
                         // вызов на редактирование или для добавления
-                        fullUrl = makeSuffixForGet(fullUrl,mi);
-                        if(!acl.checkPermission(fullUrl,(UserDetails)auth.getPrincipal(),Permission.EXECUTE)) {
+                        fullUrl = makeSuffixForGet(fullUrl, mi);
+                        if (!acl.checkPermission(fullUrl, (UserDetails) auth.getPrincipal(),
+                                Permission.EXECUTE)) {
+                            logger.warn("Запрещен " + Permission.EXECUTE
+                                    + " для " + auth.getName()
+                                    + " на " + fullUrl);
                             return false;
                         }
                         // право есть, несмотря на отсутствие прав по основному url
-                    } else
+                    } else {
                         // если метод save надо еще проверить расширенные права
-                        if(methodIsSave) {
+                        if (methodIsSave) {
                             // вызов save для вставки или обновления записи
-                            fullUrl = makeSuffixForSave(fullUrl,mi);
-                            if(!acl.checkPermission(fullUrl,(UserDetails)auth.getPrincipal(),Permission.EXECUTE)) {
+                            fullUrl = makeSuffixForSave(fullUrl, mi);
+                            if (!acl.checkPermission(fullUrl, (UserDetails) auth.getPrincipal(),
+                                    Permission.EXECUTE)) {
+                                logger.warn("Запрещен " + Permission.EXECUTE + " расширенный "
+                                        + " для " + auth.getName()
+                                        + " на " + fullUrl);
                                 return false;
                             }
                             // право есть, несмотря на отсутствие прав по основному url
                         } else {
+                            logger.warn("Запрещен " + Permission.EXECUTE
+                                    + " для " + auth.getName()
+                                    + " на " + fullUrl);
                             return false;
                         }
+                    }
                 }
             }
         }
@@ -76,23 +93,23 @@ public class RolePermissionEvaluator implements PermissionEvaluator {
         Parameter postBody = null;
         int idxParam = -1;
         Parameter[] parameters = mi.getMethod().getParameters();
-        for (int i = 0; i < parameters.length ; i++) {
+        for (int i = 0; i < parameters.length; i++) {
             Parameter p = parameters[i];
-            if(p.isAnnotationPresent(RequestBody.class)) {
+            if (p.isAnnotationPresent(RequestBody.class)) {
                 postBody = p;
                 idxParam = i;
                 break;
             }
         }
         // тип параметры должен быть Integer
-        if(postBody==null || !postBody.getType().isAssignableFrom(Integer.class)) {
+        if (postBody == null || !postBody.getType().isAssignableFrom(Integer.class)) {
             return fullUrl;
         }
         Object value = mi.getArguments()[idxParam];
-        if(value==null) {
-            return fullUrl+"#add";
+        if (value == null) {
+            return fullUrl + "#add";
         } else {
-            return fullUrl+"#edit";
+            return fullUrl + "#edit";
         }
     }
 
@@ -109,15 +126,15 @@ public class RolePermissionEvaluator implements PermissionEvaluator {
                 break;
             }
         }
-        if(postBody!=null) {
+        if (postBody != null) {
             Object value = mi.getArguments()[idxParam];
-            if(value!=null) {
+            if (value != null) {
                 Field idFld = OrmUtils.getIdField(value.getClass(), false);
                 Integer idValue = OrmUtils.getIdValueIntegerOfField(idFld, value);
-                if(idValue==null) {
-                    return fullUrl+"#ins";
+                if (idValue == null) {
+                    return fullUrl + "#ins";
                 } else {
-                    return fullUrl+"#upd";
+                    return fullUrl + "#upd";
                 }
             }
         }
@@ -125,13 +142,14 @@ public class RolePermissionEvaluator implements PermissionEvaluator {
     }
 
     private String normalizeObjectName(String pref, String url) {
-        pref = pref.endsWith("/")?pref:pref+"/";
-        url = url.startsWith("/")?url.substring(1):url;
-        return pref+url;
+        pref = pref.endsWith("/") ? pref : pref + "/";
+        url = url.startsWith("/") ? url.substring(1) : url;
+        return pref + url;
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+    public boolean hasPermission(Authentication authentication, Serializable targetId,
+            String targetType, Object permission) {
         return false;
     }
 }

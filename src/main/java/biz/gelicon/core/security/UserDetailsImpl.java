@@ -17,8 +17,8 @@ public class UserDetailsImpl implements UserDetails {
     private List<GrantedRole> grantedRoles;
 
     // используется в Method Security для передачи в PermissionEvaluator
-    // имеет значенеи при вычислении прав
-    // Внимание! не потокобезопасный, поэотому на каждый запрос должен
+    // имеет значении при вычислении прав
+    // Внимание! не потокобезопасный, поэтому на каждый запрос должен
     // создаваться собственный UserDetails
     private MethodInvocation methodInvocation;
 

@@ -58,7 +58,8 @@ public class ProguserCredentialRepository implements TableRepository<ProguserCre
         // user1  "token": "bf528245-ce41-4ab4-9595-910191c0b1b1"
         final String user1 = "e572cec4ee0d79651b3f8b15339047e114e4bab5365591748fc39e3ffc353220cc029b920795cd88f9d3c4877de8c1a7";
         ProguserCredential[] data =  new ProguserCredential[] {
-                new ProguserCredential(1,masterkey,1, CapCode.AUTH_BYPASSWORD,0,0),
+                new ProguserCredential(1,masterkey,1, CapCode.AUTH_BYPASSWORD,0,0), // SYSDBA
+                new ProguserCredential(2,masterkey,2, CapCode.AUTH_BYPASSWORD,0,0), // FULL_ACCESS
                 /*
                 new ProguserCredential(2,admin,2, CapCode.AUTH_BYPASSWORD,0,0),
                 new ProguserCredential(3,user,3, CapCode.AUTH_BYPASSWORD,0,0),

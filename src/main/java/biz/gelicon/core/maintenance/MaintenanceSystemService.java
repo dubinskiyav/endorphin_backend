@@ -89,7 +89,9 @@ public class MaintenanceSystemService {
     ProguserService proguserService;
 
 
-    /** префикс пакетов системы */
+    /**
+     * префикс пакетов системы
+     */
     @Value("${gelicon.core.prefix:biz.gelicon.core}")
     private String geliconCorePrefix;
 
@@ -97,6 +99,7 @@ public class MaintenanceSystemService {
      * Вспомогательный класс
      */
     private class AccessRoleDop {
+
         AccessRole accessRole; // Роль доступа
         String applicationName; // Имя прилолжения с которым связывать
         List<String> urlList; // Маска урл которые добавлять
@@ -137,40 +140,61 @@ public class MaintenanceSystemService {
         //controlObjectList.forEach(c -> System.out.println(c.getControlObjectUrl()));
         // Все аппликации
         List<Application> applicationList = applicationRepository.findAll();
-
         // Список ролей, которые надо создать
         List<AccessRoleDop> accessRoleDopList = new ArrayList<>();
+        AccessRoleDop ard;
+        // !!!!!!!!!!!!!!! Здесь создаем роли создаваемые при инсталляции !!!!!!!!!!!!!!
         // Модуль Пользователи
-        AccessRoleDop ard = new AccessRoleDop(
+        ard = new AccessRoleDop(
                 new AccessRole(
                         1000,
                         "_PROGUSER", //
                         "Пользователи - ведение справочника (просмотр, модификация)",
                         1),  // Эта роль будет создана
                 "Пользователи", // Это имя модуля с которым роль будет связана (application)
-                "admin/credential/proguser"  // Это маска методов контроллеров, которые будут добавляться к этой роли
+                "admin/credential/proguser"
+                // Это маска методов контроллеров, которые будут добавляться к этой роли
         );
         // Дополнительные урлы не попадающие под общую маску
         ard.urlList.add("admin/credential/accessrole/getlist");
+        ard.urlList.add("refbooks/subject/subject/gettree"); // Получение дерева ОАУ
+        ard.urlList.add("refbooks/subject/subject/find"); // Поиск ОАУ
+        ard.urlList.add("refbooks/subject/subject/getlist"); // Поиск ОАУ
         accessRoleDopList.add(ard);
-        // Здесь добавляем еще
+        // Модуль Роли
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        2000,
+                        "_ROLE", //
+                        "Роли - ведение справочника (просмотр, модификация)",
+                        1),  // Эта роль будет создана
+                "Роли", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/accessrole" // Это маска методов контроллеров
+        );
+        не проверено
+        // Дополнительные урлы не попадающие под общую маску
+        //ard.urlList.add("admin/credential/accessrole/getlist");
+        accessRoleDopList.add(ard);
+
         // Цикл по ним
-        for (AccessRoleDop accessRoleDop: accessRoleDopList) {
+        for (AccessRoleDop accessRoleDop : accessRoleDopList) {
             Integer applicationId = applicationList.stream()
-                    .filter(application -> application.getApplicationName().contains(accessRoleDop.applicationName))
+                    .filter(application -> application.getApplicationName()
+                            .contains(accessRoleDop.applicationName))
                     .findAny()
                     .map(Application::getApplicationId)
                     .orElse(null);
             if (applicationId == null) {
-                throw new RuntimeException("Не найден модуль '" + accessRoleDop.applicationName + "'");
+                throw new RuntimeException(
+                        "Не найден модуль '" + accessRoleDop.applicationName + "'");
             }
             // Добавим роль для модуля Пользователи
             AccessRole accessRole = accessRoleService.add(accessRoleDop.accessRole);
             // Найдем все контролируемые объекты, которые надо связать с этой ролью
-            List <ControlObject> lp = controlObjectList.stream()
+            List<ControlObject> lp = controlObjectList.stream()
                     .filter(c -> {
                         // По всем
-                        for (String url: accessRoleDop.urlList) {
+                        for (String url : accessRoleDop.urlList) {
                             if (c.getControlObjectUrl().contains(url)) {
                                 return true;
                             }
@@ -180,7 +204,7 @@ public class MaintenanceSystemService {
                     //.filter(c -> c.getControlObjectUrl().contains(accessRoleDop.urlList.get(0)))
                     .collect(Collectors.toList());
             // Добавим их все в controlobjectrole
-            for (ControlObject controlObject: lp) {
+            for (ControlObject controlObject : lp) {
                 accessRoleRepository.bindWithControlObject(
                         accessRole.getAccessRoleId(),
                         controlObject.getControlObjectId(),
@@ -192,10 +216,10 @@ public class MaintenanceSystemService {
                     applicationId
             );
             // todo доступ к печатным формам
-            // Дадим пользователю FULL_ACCESS
-            proguserService.saveRoles(
-                    proguserId,
-                    Collections.singletonList(accessRole.getAccessRoleId())
+            // Дадим пользователю FULL_ACCESS доступ на эту роль
+            accessRoleRepository.bindWithProgUser(
+                    accessRole.getAccessRoleId(),
+                    proguserId
             );
         }
         logger.info("Filling Access Role...Ok");
@@ -272,9 +296,9 @@ public class MaintenanceSystemService {
     }
 
     /**
-     * @param kind                          - тип артефакта
-     * @param resourceList                  - список в базе данных
-     * @param artifactCollection            - список разегистрированных нумераторов
+     * @param kind               - тип артефакта
+     * @param resourceList       - список в базе данных
+     * @param artifactCollection - список разегистрированных нумераторов
      */
     public void correctCapresource(
             ArtifactKinds kind,
@@ -284,20 +308,22 @@ public class MaintenanceSystemService {
         logDebug("correctCapresourceArtifact ...");
         Map<String, Artifact> artifactMap = resourceList.stream()
                 .filter(a -> a.getArtifactCode() != null)
-                .collect(Collectors.toMap(Artifact::getArtifactCode, Function.identity(),(r1, r2) -> r1));
+                .collect(Collectors.toMap(Artifact::getArtifactCode, Function.identity(),
+                        (r1, r2) -> r1));
         Map<String, Integer> documentIds = documentRepository.findAll().stream()
                 .filter(d -> d.getDocumentShortname() != null)
                 // придется исключать дубликаты так как в бд не по Shortname нет уникальности
-                .collect(Collectors.toMap(Document::getDocumentShortname, Document::getDocumentId,(r1, r2) -> r1));
+                .collect(Collectors.toMap(Document::getDocumentShortname, Document::getDocumentId,
+                        (r1, r2) -> r1));
         Map<String, List<Integer>> codeArtifact = artifactRepository.findAll().stream()
                 .filter(a -> a.getArtifactCode() != null)
                 .collect(Collectors.groupingBy(Artifact::getArtifactCode,
-                        Collectors.mapping(Artifact::getArtifactId,Collectors.toList())));
+                        Collectors.mapping(Artifact::getArtifactId, Collectors.toList())));
         List<Map<String, Object>> countMatchesList = artifactRepository.getDocumentBindingCounts();
         // Сравниваем по коду
         artifactCollection
                 .stream()
-                .map(ac -> (ArtifactDescriptionImpl)ac)
+                .map(ac -> (ArtifactDescriptionImpl) ac)
                 .forEach(ac -> {
                     String artifactCode = ac.getCode();
                     logDebug("artifact" + artifactCode);
@@ -324,24 +350,29 @@ public class MaintenanceSystemService {
                         artifact.setLastProguserId(Proguser.SYSDBA_PROGUSER_ID);
                         artifact.setArtifactVisibleFlag(1);// Видимость
                         artifactRepository.insert(artifact);
-                        List<Integer> resources = artifactRepository.getArtifactIdByCode(ac.getCode());
-                        if(resources != null){
+                        List<Integer> resources = artifactRepository.getArtifactIdByCode(
+                                ac.getCode());
+                        if (resources != null) {
                             codeArtifact.put(ac.getCode(), resources);
                         }
                     }
 
                     // Добавим связь с сущностью
                     String entityName = ac.getEntityName();
-                    if(entityName != null) {
+                    if (entityName != null) {
                         // Получим из имени documentId
                         Integer documentId = documentIds.get(entityName);
                         if (documentId != null) {//если документ найден
                             List<Integer> resources = codeArtifact.get(ac.getCode());
                             // Отфильтруем только то, для чего нет связи - с помощью countMatchesList
-                            resources.stream().filter(resource -> !countMatchesList.stream().anyMatch(entry ->
-                                        (entry.get("document_id").equals(documentId) && entry.get("capresource_id").equals(resource))))
+                            resources.stream()
+                                    .filter(resource -> !countMatchesList.stream().anyMatch(entry ->
+                                            (entry.get("document_id").equals(documentId)
+                                                    && entry.get("capresource_id")
+                                                    .equals(resource))))
                                     .forEach(resource -> {
-                                        artifactRepository.insertDocumentBinding(resource, Arrays.asList(documentId));
+                                        artifactRepository.insertDocumentBinding(resource,
+                                                Arrays.asList(documentId));
                                     });
                         }
                     }
@@ -350,9 +381,9 @@ public class MaintenanceSystemService {
     }
 
     /**
-     * @param kind                          - тип артефакта
-     * @param resourceList                  - список в базе данных
-     * @param reportDescriptionList         - список разегистрированных репортов
+     * @param kind                  - тип артефакта
+     * @param resourceList          - список в базе данных
+     * @param reportDescriptionList - список разегистрированных репортов
      */
     public void correctCapresourceReport(
             ArtifactKinds kind,
@@ -362,15 +393,17 @@ public class MaintenanceSystemService {
         logDebug("correctCapresourceReport ...");
         Map<String, Artifact> artifactMap = resourceList.stream()
                 .filter(a -> a.getArtifactCode() != null)
-                .collect(Collectors.toMap(Artifact::getArtifactCode, Function.identity(),(r1, r2) -> r1));
+                .collect(Collectors.toMap(Artifact::getArtifactCode, Function.identity(),
+                        (r1, r2) -> r1));
         Map<String, Integer> documentIds = documentRepository.findAll().stream()
-                .filter(d -> d.getDocumentShortname() != null && d.getDocumentShortname().isEmpty() )
+                .filter(d -> d.getDocumentShortname() != null && d.getDocumentShortname().isEmpty())
                 // придется исключать дубликаты так как в бд не по Shortname нет уникальности
-                .collect(Collectors.toMap(Document::getDocumentShortname, Document::getDocumentId,(r1, r2) -> r1));
+                .collect(Collectors.toMap(Document::getDocumentShortname, Document::getDocumentId,
+                        (r1, r2) -> r1));
         Map<String, List<Integer>> codeArtifact = artifactRepository.findAll().stream()
                 .filter(a -> a.getArtifactCode() != null)
                 .collect(Collectors.groupingBy(Artifact::getArtifactCode,
-                        Collectors.mapping(Artifact::getArtifactId,Collectors.toList())));
+                        Collectors.mapping(Artifact::getArtifactId, Collectors.toList())));
         List<Map<String, Object>> countMatchesList = artifactRepository.getDocumentBindingCounts();
         // Сравниваем по коду
         reportDescriptionList
@@ -400,24 +433,29 @@ public class MaintenanceSystemService {
                         artifact.setLastProguserId(Proguser.SYSDBA_PROGUSER_ID);
                         artifact.setArtifactVisibleFlag(1);// Видимость
                         artifactRepository.insert(artifact);
-                        List<Integer> resources = artifactRepository.getArtifactIdByCode(ac.getCode());
-                        if(resources != null){
+                        List<Integer> resources = artifactRepository.getArtifactIdByCode(
+                                ac.getCode());
+                        if (resources != null) {
                             codeArtifact.put(ac.getCode(), resources);
                         }
                     }
 
                     // Добавим связь с сущностью
                     String entityName = ac.getEntityName();
-                    if(entityName != null) {
+                    if (entityName != null) {
                         // Получим из имени documentId
                         Integer documentId = documentIds.get(entityName);
                         if (documentId != null) {//если документ найден
                             List<Integer> resources = codeArtifact.get(ac.getCode());
                             // Отфильтруем только то, для чего нет связи - с помощью countMatchesList
-                            resources.stream().filter(resource -> !countMatchesList.stream().anyMatch(entry ->
-                                    (entry.get("document_id").equals(documentId) && entry.get("capresource_id").equals(resource))))
+                            resources.stream()
+                                    .filter(resource -> !countMatchesList.stream().anyMatch(entry ->
+                                            (entry.get("document_id").equals(documentId)
+                                                    && entry.get("capresource_id")
+                                                    .equals(resource))))
                                     .forEach(resource -> {
-                                        artifactRepository.insertDocumentBinding(resource, Arrays.asList(documentId));
+                                        artifactRepository.insertDocumentBinding(resource,
+                                                Arrays.asList(documentId));
                                     });
                         }
                     }
