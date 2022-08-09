@@ -1,0 +1,170 @@
+@startuml
+page 2x2
+' Скрыть круг перед названием entity
+hide circle
+
+' Ломанные линии соединения
+skinparam linetype ortho
+
+title Система доступа Геликон Ко
+
+entity proguser {
+  * proguser_id : INTEGER
+  --
+  * progusergroup_id : INTEGER
+  * proguser_status_id : INTEGER
+  * customer_name: : VARCHAR(50)
+  proguser_fullname: : VARCHAR(50)
+  --
+  Пользователь
+}
+note left of proguser::progusergroup_id
+  Устарело
+  Всегда 1
+end note
+
+entity controlobject {
+  * controlobject_id : INTEGER
+  --
+  * controlobject_name : varchar(128)
+  * controlobject_url : varchar(255)
+  ==
+  Контролируемый объект
+}
+entity accessrole {
+  * accessrole_id : INTEGER
+  --
+  * accessrole_name: : VARCHAR(30)
+  accessrole_note: : VARCHAR(255)
+  * accessrole_visible : INTEGER
+  ==
+  Роль доступа
+}
+
+entity accessrolerole #yellow {
+  * accessrolerole_id : INTEGER
+  --
+  * accessrole_id_parent : INTEGER
+  * accessrole_id_child : INTEGER
+  ==
+  Роль роли доступа
+}
+accessrole "C" --o{ accessrolerole
+accessrole "C" --o{ accessrolerole
+
+entity proguserrole {
+	* proguserrole_id : INTEGER
+	--
+	* proguser_id : INTEGER
+	* accessrole_id : INTEGER
+	==
+	Доступ пользователя на роль
+}
+proguser "C" --o{ proguserrole
+accessrole "C" --o{ proguserrole
+
+entity sqlaction {
+  * sqlaction_id : INTEGER
+  --
+  * sqlaction_sql : varchar(10)
+   	sqlaction_note : varchar(20)
+  ==
+  Тип доступа
+}
+
+entity controlobjectrole {
+  * controlobjectrole_id : INTEGER
+  --
+  * controlobject_id : INTEGER
+  * accessrole_id : INTEGER
+  * sqlaction_id : INTEGER
+  ==
+  Доступ роли на объект
+}
+controlobject --o{ controlobjectrole
+accessrole --o{ controlobjectrole
+sqlaction --o{ controlobjectrole
+
+entity application {
+  * application_id : INTEGER
+  --
+  * application_type : : INTEGER
+  	application_code : : VARCHAR(50)
+  * application_name : : VARCHAR(50)
+  * application_exe : : VARCHAR(255)
+  	application_blob : : BYTEA
+  	application_desc : : VARCHAR(255)
+}
+
+entity applicationrole {
+  * applicationrole_id : : INTEGER
+  --
+  * accessrole_id : : INTEGER
+  * application_id : : INTEGER
+  ==
+  Доступ роли на приложение
+}
+accessrole --o{ applicationrole
+application --o{ applicationrole
+
+together {
+entity capresource {
+  * capresource_id : INTEGER
+  --
+  * resourcetrantype_id : INTEGER
+  * resourcetype_id : INTEGER
+  * capconfig_id : INTEGER
+  * proguser_id : INTEGER
+    lastproguser_id : INTEGER
+    capresource_code : VARCHAR(15)
+  * capresource_name : VARCHAR(128)
+  * capresource_active : INTEGER
+    capresource_shortcut : VARCHAR(20)
+    capresource_autor : VARCHAR(50)
+    capresource_date date
+    capresource_remark : BYTEA
+    capresource_text : BYTEA
+    capresource_blob : BYTEA
+    capresource_pcode : BYTEA
+    capresource_lastmodify : timestamp
+    capresource_build : INTEGER
+    capresource_texthash : VARCHAR(32)
+    capresource_blobhash : VARCHAR(32)
+    capresource_image : BYTEA
+    capresource_jscode : BYTEA
+    capresource_define : BYTEA
+  * capresource_datebeg : date
+  * capresource_dateend : date
+    capresource_path : VARCHAR(256)
+  ==
+  Ресурс
+}
+
+entity capresourcerole {
+  * capresourcerole_id : INTEGER
+  --
+  * accessrole_id : INTEGER
+  * capresource_id : INTEGER
+  * capresourcerole_restrictflag : INTEGER
+  ==
+  Доступ роли на ресурс
+}
+accessrole --o{ capresourcerole
+capresource --o{ capresourcerole
+
+entity capresourceapp #yellow {
+	* capresourceapp_id : INTEGER
+	--
+	* application_id : INTEGER
+	* capresource_id : INTEGER
+	==
+	Ресурс приложения
+}
+application -[#red,dashed,thickness=2]-o{ capresourceapp
+capresource --o{ capresourceapp #line:red;line.bold;text:red
+note bottom of capresourceapp
+  Непонятно зачем
+end note
+}
+
+@enduml

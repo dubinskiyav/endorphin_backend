@@ -25,6 +25,13 @@ public class RolePermissionEvaluator implements PermissionEvaluator {
     @Autowired
     ACL acl;
 
+    /**
+     * Проверка доступа на урл здесь
+     * @param auth
+     * @param targetDomainObject
+     * @param permission
+     * @return
+     */
     @Override
     public boolean hasPermission(Authentication auth, Object targetDomainObject,
             Object permission) {

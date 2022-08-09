@@ -23,6 +23,12 @@ public class AccessRoleRepository implements TableRepository<AccessRole> {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Список ролей для пользователя
+     *
+     * @param progUserId - пользователь
+     * @return - список
+     */
     public List<AccessRole> findByUser(Integer progUserId) {
         List<AccessRole> accessRoleList;
         if (progUserId == Proguser.SYSDBA_PROGUSER_ID) {
@@ -46,18 +52,59 @@ public class AccessRoleRepository implements TableRepository<AccessRole> {
         return accessRoleList;
     }
 
+    /**
+     * Список ролей для пользователя с рекурсией
+     *
+     * @param progUserId - пользователь
+     * @return - список
+     * @author dav 09.08.2022
+     */
+    public List<AccessRole> findByUserRecursive(Integer progUserId) {
+        List<AccessRole> accessRoleList = findByUser(progUserId);
+        if (progUserId == Proguser.SYSDBA_PROGUSER_ID) {
+            return accessRoleList;
+        }
+        // Дополнительные роли, полученный из ролей ролей
+        List<AccessRole> accessRoleListTree = new ArrayList<>();
+        for (AccessRole accessRole : accessRoleList) {
+            List<AccessRole> tree = findQuery(""
+                            + " WITH RECURSIVE tree AS ( "
+                            + "   SELECT accessrolerole_id, "
+                            + "          accessrole_id_parent, "
+                            + "          accessrole_id_child "
+                            + "   FROM   accessrolerole "
+                            + "   WHERE  accessrole_id_parent = :accessrole_id_parent "
+                            + "   UNION "
+                            + "   SELECT accessrolerole.accessrolerole_id, "
+                            + "          accessrolerole.accessrole_id_parent, "
+                            + "          accessrolerole.accessrole_id_child "
+                            + "   FROM   accessrolerole "
+                            + "          JOIN tree "
+                            + "            ON accessrolerole.accessrole_id_parent = tree.accessrole_id_child "
+                            + " ) "
+                            + " SELECT AR.*                      "
+                            + " FROM   tree "
+                            + "        INNER JOIN accessrole AR ON AR.accessrole_id = accessrole_id_child "
+                    , "accessrole_id_parent", accessRole.getAccessRoleId());
+            accessRoleListTree.addAll(tree);
+        }
+        // todo тут бы убрать дубликаты но лень
+        accessRoleList.addAll(accessRoleListTree); // Добавим рекурсию
+        return accessRoleList;
+    }
+
     public List<ObjectRoleView> findAllObjectRoles() {
         String sqlText = "" +
                 "SELECT DISTINCT " +
-                    "cor.accessrole_id, " +
-                    "cor.controlobject_id, " +
-                    "co.controlobject_url, " +
-                    "cor.sqlaction_id " +
+                "cor.accessrole_id, " +
+                "cor.controlobject_id, " +
+                "co.controlobject_url, " +
+                "cor.sqlaction_id " +
                 "FROM   controlobjectrole cor " +
-                    "INNER JOIN accessrole ar ON ar.accessrole_id=cor.accessrole_id " +
-                    "INNER JOIN controlobject co ON co.controlobject_id=cor.controlobject_id " +
+                "INNER JOIN accessrole ar ON ar.accessrole_id=cor.accessrole_id " +
+                "INNER JOIN controlobject co ON co.controlobject_id=cor.controlobject_id " +
                 "WHERE ar.accessrole_visible!=0";
-        return findQuery(ObjectRoleView.class,sqlText);
+        return findQuery(ObjectRoleView.class, sqlText);
     }
 
     /**

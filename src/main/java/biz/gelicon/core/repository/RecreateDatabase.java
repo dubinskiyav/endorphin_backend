@@ -1,6 +1,7 @@
 package biz.gelicon.core.repository;
 
 import biz.gelicon.core.components.core.accessrole.AccessRoleRepository;
+import biz.gelicon.core.components.core.accessrolerole.AccessRoleRoleRepository;
 import biz.gelicon.core.components.core.application.ApplicationRepository;
 import biz.gelicon.core.components.core.applicationrole.ApplicationroleRepository;
 import biz.gelicon.core.components.core.cal.CalRepository;
@@ -224,6 +225,8 @@ public class RecreateDatabase {
     CompanycodeRepository companycodeRepository;
     @Autowired
     ProguserWorkerRepository proguserWorkerRepository;
+    @Autowired
+    AccessRoleRoleRepository accessRoleRoleRepository;
 
 
     @Autowired
@@ -305,7 +308,8 @@ public class RecreateDatabase {
                 , calRepository
                 , capjobRepository
                 , capjobhistoryRepository
-                ,notificationRepository
+                , notificationRepository
+                , accessRoleRoleRepository
                 // erp контур
                 , subjectTypeRepository
                 , clusterrRepository

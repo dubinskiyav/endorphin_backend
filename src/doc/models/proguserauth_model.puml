@@ -1,0 +1,62 @@
+@startuml
+page 2x2
+' Скрыть круг перед названием entity
+hide circle
+
+' Ломанные линии соединения
+skinparam linetype ortho
+
+title Аутентификация пользователя
+
+entity proguser {
+  * proguser_id : INTEGER
+  --
+  * proguser_status_id : INTEGER
+  * customer_name: : VARCHAR(50)
+  proguser_fullname: : VARCHAR(50)
+}
+note left of proguser
+  Пользователь
+end note
+
+entity proguserauth {
+  proguserauth_id int4 NOT NULL,
+  --
+  * proguser_id : INTEGER
+  * proguserauth_datecreate : date
+  * proguserauth_lastquery : date
+   	proguserauth_dateend : date
+  * proguserauth_token : varchar(128)
+}
+proguser --o{ proguserauth
+note bottom of proguserauth
+  Авторизационный токен пользователя
+end note
+
+entity proguserchannel {
+  * proguserchannel_id : INTEGER
+  --
+  * proguser_id : INTEGER
+  * channelnotification_id : INTEGER
+    proguserchannel_address : varchar(125)
+}
+proguser --o{ proguserchannel
+note bottom of proguserchannel
+  Канал оповещения пользователя
+end note
+
+entity progusercredential {
+  * progusercredential_id : INTEGER
+  --
+  * progusercredential_password : varchar(128)
+  * proguser_id : INTEGER
+  * progusercredential_type : INTEGER
+  * progusercredential_lockflag : INTEGER
+  * progusercredential_tempflag : INTEGER
+}
+proguser --o{ progusercredential
+note bottom of progusercredential
+  Учетная запись пользователя
+end note
+
+@enduml

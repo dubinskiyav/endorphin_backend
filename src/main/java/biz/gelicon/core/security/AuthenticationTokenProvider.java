@@ -105,9 +105,15 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
         return new AuthenticationCashe.CasheRecord(auth,pu,roles);
     }
 
+    /**
+     * Список авторизованных ролей пользователя
+     * @param pu
+     * @return
+     */
     public List<AccessRole> refreshAuthorizationInfo(Proguser pu) {
         // получаем список ролей
-        List<AccessRole> roles = accessRoleRepository.findByUser(pu.getProguserId());
+        // dav с рекурсией!!!
+        List<AccessRole> roles = accessRoleRepository.findByUserRecursive(pu.getProguserId());
         // получаем разные атрибуты
         // связь с ОАУ
         Subject sbj = subjectRepository.findSubjectLinkWithUser(pu.getProguserId());
