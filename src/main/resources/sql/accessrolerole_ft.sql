@@ -4,7 +4,7 @@ SELECT ARR.accessrolerole_id,
        ARP.accessrole_name,                               ' ',
        ARP.accessrole_note,                               ' ',
        ARC.accessrole_name,                               ' ',
-       ARC.accessrole_name
+       ARC.accessrole_note
        ) AS fulltext
 FROM   accessrolerole ARR,
        accessrole ARP,

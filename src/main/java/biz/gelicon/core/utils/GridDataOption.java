@@ -161,10 +161,12 @@ public class GridDataOption {
                     .collect(Collectors.toList());
         }
 
-        return PageRequest.of(
+
+        PageRequest ret = PageRequest.of(
                 pagination.getCurrent() - 1,  // особенности клиента. Номер страницы начинается с 1
                 pagination.getPageSize()<0?Integer.MAX_VALUE:pagination.getPageSize(),
                 Sort.by(orders));
+        return ret;
     }
 
     public Map<String, Object> buildQueryParams() {

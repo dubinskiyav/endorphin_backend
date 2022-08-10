@@ -1,3 +1,4 @@
+SELECT * FROM (
 SELECT ARR.accessrolerole_id,
        ARR.accessrole_id_parent,
        ARP.accessrole_name accessrole_name_parent,
@@ -10,7 +11,9 @@ SELECT ARR.accessrolerole_id,
 FROM   accessrolerole ARR,
        accessrole ARP,
        accessrole ARC
-       /*FROM_PLACEHOLDER*/
 WHERE  ARP.accessrole_id = ARR.accessrole_id_parent
   AND  ARC.accessrole_id = ARR.accessrole_id_child
+) T
+       /*FullTextJoin*/
+       /*FROM_PLACEHOLDER*/
 /*ORDERBY_PLACEHOLDER*/

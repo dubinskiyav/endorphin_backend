@@ -57,7 +57,6 @@ public class AccessRoleController {
 
     @Operation(summary = ConstantForControllers.GETLIST_OPERATION_SUMMARY,
             description = ConstantForControllers.GETLIST_OPERATION_DESCRIPTION)
-    // dav убираем за ненадобностью @CheckAdminPermission
     @CheckPermission
     @RequestMapping(value = "accessrole/getlist", method = RequestMethod.POST)
     public DataResponse<AccessRoleView> getlist(

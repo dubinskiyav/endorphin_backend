@@ -155,7 +155,7 @@ public class Query<T> {
             this.sqlText =sql;
         }
         public QueryBuilder(Resource sql) {
-            this.sqlText =UsefulUtils.load(sql);
+            this.sqlText = UsefulUtils.load(sql);
         }
 
         public QueryBuilder<T> setMainAlias(String alias) {
