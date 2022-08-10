@@ -198,6 +198,13 @@ public class GridDataOption {
         return buildPredicate(cls,mainAlias,null);
     }
 
+    /**
+     * Составляет секцию WHERE самое начало?
+     * @param cls
+     * @param mainAlias
+     * @param columnSubstitution
+     * @return
+     */
     public String buildPredicate(Class<?> cls,String mainAlias,Map<String,String> columnSubstitution) {
         List<String> where = new ArrayList<>();
         // полнотектовый поиск

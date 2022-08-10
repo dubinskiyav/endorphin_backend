@@ -248,7 +248,7 @@ public class MaintenanceSystemService {
                 // Добавим роль для роли
                 AccessRoleRoleRepository accessRoleRoleRepository = new AccessRoleRoleRepository();
                 accessRoleRoleRepository.insert(new AccessRoleRole(
-                        0,
+                        null,
                         accessRoleDop.accessRole.getAccessRoleId(),
                         accessRoleId)
                 );

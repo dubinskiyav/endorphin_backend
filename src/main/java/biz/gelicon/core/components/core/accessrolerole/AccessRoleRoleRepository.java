@@ -25,6 +25,16 @@ public class AccessRoleRoleRepository implements TableRepository<AccessRoleRole>
         databasePopulator.execute(jdbcTemplate.getDataSource());
         logger.info("AccessRoleRole created");
     }
+    @Override
+    public void createFullTextView() {
+        String fileName = "sql/accessrolerole_ft.sql";
+        Resource resource = new ClassPathResource(fileName);
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(resource);
+        databasePopulator.setSqlScriptEncoding("UTF-8");
+        databasePopulator.execute(jdbcTemplate.getDataSource());
+        logger.info(fileName + " was executed");
+
+    }
 
 }
 
