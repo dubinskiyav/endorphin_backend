@@ -17,15 +17,15 @@ public class AccessRoleRoleView {
 
     @Schema(description = "Наименование родителя")
     @Column(name="accessrole_name_parent")
-    private String accessRoleNameParent;
+    public String accessRoleNameParent;
 
     @Schema(description = "Описание родителя")
     @Column(name="accessrole_note_parent")
-    private String accessRoleNoteParent;
+    public String accessRoleNoteParent;
 
     @Schema(description = "Видимость родителя")
     @Column(name="accessrole_visible_parent")
-    private Integer accessRoleVisibleParent;
+    public Integer accessRoleVisibleParent;
 
     @Schema(description = "Идентификатор ребенка")
     @Column(name="accessrole_id_child")
@@ -33,15 +33,15 @@ public class AccessRoleRoleView {
 
     @Schema(description = "Наименование ребенка")
     @Column(name="accessrole_name_child")
-    private String accessRoleNameChild;
+    public String accessRoleNameChild;
 
     @Schema(description = "Описание ребенка")
     @Column(name="accessrole_note_child")
-    private String accessRoleNoteChild;
+    public String accessRoleNoteChild;
 
     @Schema(description = "Видимость ребенка")
     @Column(name="accessrole_visible_child")
-    private Integer accessRoleVisibleChild;
+    public Integer accessRoleVisibleChild;
 
     public AccessRoleRoleView() {}
 
@@ -132,5 +132,25 @@ public class AccessRoleRoleView {
     public Integer getAccessRoleVisibleChild() {
         return accessRoleVisibleChild;
     }
+
+    /**
+     * Из сущности делает представление
+     * @param entity - сущность
+     */
+    // todo доделать
+    public AccessRoleRoleView(AccessRoleRole entity) {
+        this.accessRoleRoleId = entity.getAccessRoleRoleId();
+        this.accessRoleIdParent = entity.getAccessRoleIdParent();
+        this.accessRoleNameParent = "Родитель";
+        this.accessRoleNoteParent = "Описание родителя";
+        this.accessRoleVisibleParent = 1;
+        this.accessRoleIdChild = entity.getAccessRoleIdChild();
+        this.accessRoleNameChild = "Вложение";
+        this.accessRoleNoteChild = "Описание вложения";
+        this.accessRoleVisibleChild = 1;
+
+    }
+
+
 }
 

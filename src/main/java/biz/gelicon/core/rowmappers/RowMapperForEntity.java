@@ -34,7 +34,8 @@ public class RowMapperForEntity implements RowMapper<Object> {
             constructor = entityClass.getConstructor();
         } catch (Exception ex) {
             throw new RuntimeException
-                    (String.format("Default constructor %s() not found", entityClass.getClass().getName()), ex);
+                    (String.format("Default constructor %s() not found", entityClass.getName())
+                            + ": Создайте конструктор без параметров в модели", ex);
         }
     }
 

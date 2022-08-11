@@ -512,7 +512,8 @@ public interface TableRepository<T> {
                 + " WHERE " + tableMetadata.getIdFieldName() + " = :id";
         OrmUtils.logSQL(sqlText);
         // Маппер с классом для модели
-        RowMapper resultSetRowMapper = new RowMapperForEntity(getTableModelClass());
+        Class c = getTableModelClass();
+        RowMapper resultSetRowMapper = new RowMapperForEntity(c);
         List<T> tList = null;
         try {
             NamedParameterJdbcTemplate jdbcTemplate = OrmUtils.getNamedParameterJdbcTemplate();

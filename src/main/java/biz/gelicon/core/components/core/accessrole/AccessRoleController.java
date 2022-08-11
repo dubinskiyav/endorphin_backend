@@ -103,7 +103,6 @@ public class AccessRoleController {
 
     @Operation(summary = ConstantForControllers.SAVE_OPERATION_SUMMARY,
             description = ConstantForControllers.SAVE_OPERATION_DESCRIPTION)
-    // dav убираем за ненадобностью @CheckAdminPermission
     @CheckPermission
     @RequestMapping(value = "accessrole/save", method = RequestMethod.POST)
     @Audit(kinds = {AuditKind.CALL_FOR_SAVE_INSERT, AuditKind.CALL_FOR_SAVE_UPDATE})

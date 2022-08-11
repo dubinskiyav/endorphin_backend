@@ -1,6 +1,5 @@
 package biz.gelicon.core.components.core.accessrolerole;
 
-import biz.gelicon.core.components.core.accessrole.AccessRole;
 import biz.gelicon.core.utils.ValidateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ public class AccessRoleRoleValidator implements Validator {
     // Проверка на совпадение класса
     @Override
     public boolean supports(Class<?> aClass) {
-        return AccessRole.class.equals(aClass);
+        return AccessRoleRole.class.equals(aClass);
     }
 
     @Override
