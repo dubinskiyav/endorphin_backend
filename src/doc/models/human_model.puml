@@ -1,0 +1,36 @@
+@startuml
+page 2x2
+' Скрыть круг перед названием entity
+hide circle
+
+' Ломанные линии соединения
+skinparam linetype ortho
+
+title Физические лица
+
+entity humangender {
+  * humangender_id : INTEGER
+  --
+  * humangender_name : VARCHAR(20)
+  * humangender_abbr : VARCHAR(3)
+  ==
+  Пол человека
+}
+
+entity human {
+  * human_id : INTEGER
+  --
+  * human_abbr : VARCHAR(255)
+    human_surname : VARCHAR(255)
+    human_name : VARCHAR(255)
+    human_patronymic : VARCHAR(255)
+    humangender_id : INTEGER
+    human_birthday : DATE
+    human_inn : VARCHAR(255)
+    human_note : VARCHAR(255)
+  ==
+  Физическое лицо
+}
+humangender --o{ human
+
+@enduml

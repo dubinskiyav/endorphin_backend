@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -18,12 +19,12 @@ public class AccessRoleRole {
     @Column(name = "accessrolerole_id",nullable = false)
     public Integer accessRoleRoleId;
 
-    @ManyToMany(targetEntity = AccessRole.class, cascade = {CascadeType.REMOVE})
+    @OneToMany(targetEntity = AccessRole.class, cascade = {CascadeType.REMOVE})
     @Column(name = "accessrole_id_parent",nullable = false)
     @NotNull(message = "Поле 'Роль - родитель' не может быть пустым")
     public Integer accessRoleIdParent;
 
-    @ManyToMany(targetEntity = AccessRole.class, cascade = {CascadeType.REMOVE})
+    @OneToMany(targetEntity = AccessRole.class, cascade = {CascadeType.REMOVE})
     @NotNull(message = "Поле 'Роль - ребенок' не может быть пустым")
     @Column(name = "accessrole_id_child",nullable = false)
     private Integer accessRoleIdChild;

@@ -59,6 +59,8 @@ import biz.gelicon.core.components.core.town.TownRepository;
 import biz.gelicon.core.components.core.townsubordinate.TownsubordinateRepository;
 import biz.gelicon.core.components.core.towntype.TownTypeRepository;
 import biz.gelicon.core.components.core.worker.WorkerRepository;
+import biz.gelicon.core.components.erp.human.HumanGenderRepository;
+import biz.gelicon.core.components.erp.human.HumanRepository;
 import biz.gelicon.core.components.erp.todo.appendix.AppendixRepository;
 import biz.gelicon.core.components.erp.todo.documentagreement.DocumentAgreementRepository;
 import biz.gelicon.core.components.erp.todo.documentagreementuser.DocumentAgreementUserRepository;
@@ -171,8 +173,6 @@ public class RecreateDatabase {
     CapjobhistoryRepository capjobhistoryRepository;
     @Autowired
     NotificationRepository notificationRepository;
-
-    // erp контур
     @Autowired
     SubjectTypeRepository subjectTypeRepository;
     @Autowired
@@ -227,6 +227,12 @@ public class RecreateDatabase {
     ProguserWorkerRepository proguserWorkerRepository;
     @Autowired
     AccessRoleRoleRepository accessRoleRoleRepository;
+
+    // erp контур
+    @Autowired
+    HumanGenderRepository humanGenderRepository;
+    @Autowired
+    HumanRepository humanRepository;
 
 
     @Autowired
@@ -310,7 +316,6 @@ public class RecreateDatabase {
                 , capjobhistoryRepository
                 , notificationRepository
                 , accessRoleRoleRepository
-                // erp контур
                 , subjectTypeRepository
                 , clusterrRepository
                 , subjectRepository
@@ -331,12 +336,15 @@ public class RecreateDatabase {
                 , districtRepository
                 , subdistrictRepository
                 , addressRepository
-                ,aaddressindexRepository
-                ,companyRepository
-                ,mycompanyRepository
-                ,companybranchRepository
-                ,companycodeRepository
-                ,proguserWorkerRepository
+                , aaddressindexRepository
+                , companyRepository
+                , mycompanyRepository
+                , companybranchRepository
+                , companycodeRepository
+                , proguserWorkerRepository
+                // erp контур
+                , humanGenderRepository
+                , humanRepository
                 /*
                   progUserAuthRepository,
                   edizmRepository,
@@ -494,7 +502,6 @@ public class RecreateDatabase {
         }
         logger.info("Database recreated");
     }
-
 
 
 }

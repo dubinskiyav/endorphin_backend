@@ -12,8 +12,8 @@ entity proguser {
   * proguser_id : INTEGER
   --
   * proguser_status_id : INTEGER
-  * customer_name: : VARCHAR(50)
-  proguser_fullname: : VARCHAR(50)
+  * customer_name : VARCHAR(50)
+  proguser_fullname : VARCHAR(50)
 }
 note left of proguser
   Пользователь
