@@ -172,6 +172,12 @@ public class ApplicationRepository implements TableRepository<Application> {
                         null),
                 new Application(4, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm3", "Права", "credential",
                         null),
+                new Application(5, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm6", "Роли ролей", "credential",
+                        null),
+                new Application(6, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm4", "Доступ к модулям", "credential",
+                        null),
+                new Application(7, Application.TYPE_GELICON_CORE_APP, "s4.m0.sm5", "Доступ к ресурсам", "credential",
+                        null),
         };
         insert(Arrays.asList(data));
 

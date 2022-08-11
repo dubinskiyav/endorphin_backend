@@ -136,7 +136,7 @@ public class MaintenanceSystemService {
                 .map(Proguser::getProguserId)
                 .orElse(null);
         if (proguserId == null) {
-            throw new RuntimeException("Не найден пользователь '" + proguserName + "'");
+            logger.warn("Не найден пользователь '" + proguserName + "'");
         }
         // Все контролируемые объекты
         List<ControlObject> controlObjectList = controlObjectRepository.findAll();
@@ -147,11 +147,11 @@ public class MaintenanceSystemService {
         List<AccessRoleDop> accessRoleDopList = new ArrayList<>();
         AccessRoleDop ard;
         // !!!!!!!!!!!!!!! Здесь создаем роли создаваемые при инсталляции !!!!!!!!!!!!!!
-        // Роль на просмотр дерева ОАУ
-        int accessRoleIdSubjectTree = 100000;
+        // Вспомогательная Роль на просмотр дерева ОАУ
+        int SubjectTreeAccessRoleId = 100000;
         ard = new AccessRoleDop(
                 new AccessRole(
-                        accessRoleIdSubjectTree,
+                        SubjectTreeAccessRoleId,
                         "_SUBJECT_TREE", //
                         "Дерево объектов аналитического учета - просмотр",
                         1),  // Эта роль будет создана
@@ -163,7 +163,20 @@ public class MaintenanceSystemService {
         ard.urlList.add("refbooks/subject/subject/find"); // Поиск ОАУ
         ard.urlList.add("refbooks/subject/subject/getlist"); // Поиск ОАУ
         accessRoleDopList.add(ard);
-        // Модуль Пользователи
+        // Вспомогательная роль - люкап Роли
+        int accessRoleLookUpAccessRoleId = 200000;
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        accessRoleLookUpAccessRoleId,
+                        "_ROLE_LOOKUP", //
+                        "Роли - список выбора",
+                        1),  // Эта роль будет создана
+                null, // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/accessrole/getlist"
+                // Это маска методов контроллеров, которые будут добавляться к этой роли
+        );
+        accessRoleDopList.add(ard);
+        // Роль для модуля Пользователи
         ard = new AccessRoleDop(
                 new AccessRole(
                         1000,
@@ -176,12 +189,8 @@ public class MaintenanceSystemService {
         );
         // Дополнительные урлы не попадающие под общую маску
         ard.urlList.add("admin/credential/accessrole/getlist");
-        /*
-        ard.urlList.add("refbooks/subject/subject/gettree"); // Получение дерева ОАУ
-        ard.urlList.add("refbooks/subject/subject/find"); // Поиск ОАУ
-        ard.urlList.add("refbooks/subject/subject/getlist"); // Поиск ОАУ
-        */
-        ard.accessRoleIdList.add(accessRoleIdSubjectTree);// Добавим роль - дерево ОАУ
+        // Дополнительные роли, входящие в эту роль
+        ard.accessRoleIdList.add(SubjectTreeAccessRoleId);// просмотр дерево ОАУ
         accessRoleDopList.add(ard);
         // Модуль Роли
         ard = new AccessRoleDop(
@@ -196,6 +205,69 @@ public class MaintenanceSystemService {
         // Дополнительные урлы не попадающие под общую маску
         //ard.urlList.add("admin/credential/accessrole/getlist");
         accessRoleDopList.add(ard);
+        // Роль для Модуля Роли ролей
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        3000,
+                        "_ROLE_ROLE", //
+                        "Роли ролей - ведение справочника (просмотр, модификация)",
+                        1),  // Эта роль будет создана
+                "Роли ролей", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/accessrolerole" // Это маска методов контроллеров
+        );
+        // Дополнительные урлы не попадающие под общую маску
+        //ard.urlList.add("admin/credential/accessrole/getlist");
+        // Дополнительные роли, входящие в эту роль
+        ard.accessRoleIdList.add(accessRoleLookUpAccessRoleId);// Люкап Роли
+        accessRoleDopList.add(ard);
+        // Роль для модуля Права
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        4000,
+                        "_CONTROLOBJECT", //
+                        "Права - раздача прав на роли",
+                        1),  // Эта роль будет создана
+                "Права", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/controlobject/getlist" // Это маска методов контроллеров
+        );
+        // Дополнительные урлы не попадающие под общую маску
+        ard.urlList.add("admin/credential/controlobject/allow");
+        ard.urlList.add("admin/credential/controlobject/deny");
+        ard.urlList.add("admin/credential/accessrolerole/getlist");
+        // Дополнительные роли, входящие в эту роль
+        ard.accessRoleIdList.add(accessRoleLookUpAccessRoleId);// Люкап Роли
+        accessRoleDopList.add(ard);
+        // Роль для модуля Доступ к модулям
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        5000,
+                        "_APPLICATIONROLE", //
+                        "Права - раздача прав на модуля для роли",
+                        1),  // Эта роль будет создана
+                "Доступ к модулям", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/applicationrole" // Это маска методов контроллеров
+        );
+        // Дополнительные роли, входящие в эту роль
+        ard.accessRoleIdList.add(accessRoleLookUpAccessRoleId);// Люкап Роли
+        // Дополнительные урлы не попадающие под общую маску
+        //ard.urlList.add("admin/credential/controlobject/allow");
+        accessRoleDopList.add(ard);
+        // Роль для модуля Доступ к ресурсам
+        ard = new AccessRoleDop(
+                new AccessRole(
+                        6000,
+                        "_ARTIFACTROLE", //
+                        "Доступ к ресурсам - раздача прав на ресурсы для роли",
+                        1),  // Эта роль будет создана
+                "Доступ к ресурсам", // Это имя модуля с которым роль будет связана (application)
+                "admin/credential/artifactrole" // Это маска методов контроллеров
+        );
+        // Дополнительные роли, входящие в эту роль
+        ard.accessRoleIdList.add(accessRoleLookUpAccessRoleId);// Люкап Роли
+        // Дополнительные урлы не попадающие под общую маску
+        //ard.urlList.add("admin/credential/controlobject/allow");
+        accessRoleDopList.add(ard);
+
 
         // Цикл по ним
         for (AccessRoleDop accessRoleDop : accessRoleDopList) {
@@ -208,12 +280,6 @@ public class MaintenanceSystemService {
                         .map(Application::getApplicationId)
                         .orElse(null);
             }
-            /*
-            if (applicationId == null) {
-                throw new RuntimeException(
-                        "Не найден модуль '" + accessRoleDop.applicationName + "'");
-            }
-            */
             // Добавим роль
             AccessRole accessRole = accessRoleService.add(accessRoleDop.accessRole);
             // Найдем все контролируемые объекты, которые надо связать с этой ролью
@@ -227,7 +293,6 @@ public class MaintenanceSystemService {
                         }
                         return false;
                     })
-                    //.filter(c -> c.getControlObjectUrl().contains(accessRoleDop.urlList.get(0)))
                     .collect(Collectors.toList());
             // Добавим их все в controlobjectrole
             for (ControlObject controlObject : lp) {
@@ -256,10 +321,13 @@ public class MaintenanceSystemService {
             // todo доступ к печатным формам
             if (applicationId != null) { // Это не вспомогательная роль
                 // Дадим пользователю FULL_ACCESS доступ на эту роль
-                accessRoleRepository.bindWithProgUser(
-                        accessRole.getAccessRoleId(),
-                        proguserId
-                );
+                // если он есть
+                if (proguserId != null) {
+                    accessRoleRepository.bindWithProgUser(
+                            accessRole.getAccessRoleId(),
+                            proguserId
+                    );
+                }
             }
         }
         logger.info("Filling Access Role...Ok");

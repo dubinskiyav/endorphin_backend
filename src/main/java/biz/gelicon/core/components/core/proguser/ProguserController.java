@@ -244,7 +244,6 @@ public class ProguserController {
 
     @Operation(summary = ConstantForControllers.DELETE_OPERATION_SUMMARY,
             description = ConstantForControllers.DELETE_OPERATION_DESCRIPTION)
-    // dav убираем за ненадобностью @CheckAdminPermission
     @CheckPermission
     @RequestMapping(value = "proguser/delete", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.CALL_FOR_DELETE})
@@ -328,7 +327,6 @@ public class ProguserController {
 
     @Operation(summary = "Сохранить список ролей пользователя",
             description = "Сохраняет список ролей указанного пользователя")
-    // dav убираем за ненадобностью @CheckAdminPermission
     @CheckPermission
     @RequestMapping(value = "proguser/roles/save", method = RequestMethod.POST)
     @Audit(kinds={AuditKind.SECURITY_SYSTEM})
@@ -336,6 +334,11 @@ public class ProguserController {
         proguserService.saveRoles(proguserRoleDTO.getProguserId(),proguserRoleDTO.getAccessRoleIds());
         // перестраиваем ACL асинхронно
         jobACLDispather.pushJob(()->acl.buildAccessTable());
+        // dav
+        // кеш сбросим
+        String proguserName = proguserService.getOne(proguserRoleDTO.getProguserId()).getProguserName();
+        authenticationCashe.clearByUserName(proguserName);
+
         return StandardResponse.SUCCESS;
     }
 
